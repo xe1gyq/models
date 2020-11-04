@@ -79,6 +79,7 @@ slice_sets:
     - destination: quickstart
       source: quickstart/object_detection/tensorflow/ssd-resnet34/inference/int8
     partials:
+    - numactl
     - libgl
     - opencv
     - tensorflow-addons-0.8.1

@@ -74,7 +74,7 @@ slice_sets:
               - openssh-7.6
               - horovod
           args:
-              - PY_VERSION=3.7
+              - PY_VERSION=3.6
     
     intel-python:
         - add_to_name: ""
@@ -82,7 +82,7 @@ slice_sets:
               - miniconda
               - intel-python
           args:
-              - PY_VERSION=3
+              - PY_VERSION=3.6
               - INTEL_PY_BUILD=2020.2
 
     image-recognition:
