@@ -39,8 +39,7 @@ class LaunchMultiInstanceBenchmark(object):
         cpu_info_list, test_cores_list = self.cpu_info(cores_per_instance)
 
         # Create the shell script with run commands for each instance
-        multi_instance_command = ("#!/usr/bin/env bash \n\n"
-                                  "apt-get install numactl -y\n\n")
+        multi_instance_command = "#!/usr/bin/env bash \n\n"
 
         for test_cores in test_cores_list:
             instance_num = test_cores_list.index(test_cores)
@@ -62,7 +61,7 @@ class LaunchMultiInstanceBenchmark(object):
                                       "bash {1} "
                                       "--num-intra-threads {2} --num-inter-threads 1 "
                                       "--data-num-intra-threads {2} --data-num-inter-threads 1 "
-                                      "> {3} 2>&1 & \\ \n").format(
+                                      "> {3} 2>&1 & \\\n").format(
                 prefix, run_script, len(test_cores), instance_log)
 
         multi_instance_command += "wait"
