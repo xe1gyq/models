@@ -15,6 +15,7 @@ class LaunchMultiInstanceBenchmark(object):
     def __init__(self, args):
         self.args = args
         run_script = self.args.run_script.strip()
+        script_basename = os.path.splitext(os.path.basename(run_script))[0]
 
         if "OUTPUT_DIR" in os.environ:
             output_dir = os.getenv("OUTPUT_DIR")
@@ -38,7 +39,8 @@ class LaunchMultiInstanceBenchmark(object):
         cpu_info_list, test_cores_list = self.cpu_info(cores_per_instance)
 
         # Create the shell script with run commands for each instance
-        multi_instance_command = "#!/usr/bin/env bash \n"
+        multi_instance_command = ("#!/usr/bin/env bash \n\n"
+                                  "apt-get install numactl -y\n\n")
 
         for test_cores in test_cores_list:
             instance_num = test_cores_list.index(test_cores)
@@ -49,7 +51,6 @@ class LaunchMultiInstanceBenchmark(object):
                 continue
 
             numactl_cpu_list = ','.join(test_cores)
-            script_basename = os.path.splitext(os.path.basename(run_script))[0]
             instance_log = os.path.join(output_dir, "{}_instance{}.log".
                                         format(script_basename, instance_num))
 
@@ -70,7 +71,7 @@ class LaunchMultiInstanceBenchmark(object):
         # Write command file
         command_file_path = "instance{}_cores{}_{}".format(
             len(test_cores_list), cores_per_instance, os.path.basename(run_script))
-        command_file_path = os.path.join(os.getcwd(), "quickstart", command_file_path)
+        command_file_path = os.path.join(output_dir, command_file_path)
 
         if not args.dry_run:
             with open(command_file_path, 'w+') as tf:

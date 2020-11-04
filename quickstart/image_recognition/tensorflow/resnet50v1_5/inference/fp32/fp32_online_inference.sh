@@ -33,6 +33,12 @@ elif [ ! -d "${DATASET_DIR}" ]; then
   exit 1
 fi
 
+# If a prefix was given, don't specify a socket id
+socket_id_arg="--socket-id 0"
+if [[ ! -z "${PREFIX}" ]]; then
+  socket_id_arg=""
+fi
+
 MODEL_FILE="$(pwd)/resnet50_v1.pb"
 
 source "$(dirname $0)/common/utils.sh"
@@ -45,5 +51,5 @@ _command ${PREFIX} python benchmarks/launch_benchmark.py \
          ${dataset_arg} \
          --output-dir ${OUTPUT_DIR} \
          --batch-size=1 \
-         --socket-id 0 \
+         ${socket_id_arg} \
          $@
