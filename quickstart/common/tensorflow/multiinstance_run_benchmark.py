@@ -56,7 +56,7 @@ class LaunchMultiInstanceBenchmark(object):
                       "numactl --localalloc --physcpubind={1}").format(len(test_cores), numactl_cpu_list)
 
             multi_instance_command += ("PREFIX=\"{0}\" "
-                                      "{1} "
+                                      "bash {1} "
                                       "--num-intra-threads {2} --num-inter-threads 1 "
                                       "--data-num-intra-threads {2} --data-num-inter-threads 1 "
                                       "> {3} 2>&1 & \\ \n").format(
