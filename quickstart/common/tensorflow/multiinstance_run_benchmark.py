@@ -49,7 +49,9 @@ class LaunchMultiInstanceBenchmark(object):
                 continue
 
             numactl_cpu_list = ','.join(test_cores)
-            instance_log = os.path.join(output_dir, "instance{}.log".format(instance_num))
+            script_basename = os.path.splitext(os.path.basename(run_script))[0]
+            instance_log = os.path.join(output_dir, "{}_instance{}.log".
+                                        format(script_basename, instance_num))
 
             prefix = ("OMP_NUM_THREADS={0} "
                       "KMP_AFFINITY=granularity=fine,verbose,compact,1,0 "
