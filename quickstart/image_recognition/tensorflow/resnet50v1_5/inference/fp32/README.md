@@ -22,8 +22,8 @@ ImageNet dataset in the TF records format.
 
 | Script name | Description |
 |-------------|-------------|
-| [`fp32_online_inference.sh`](fp32_online_inference.sh) | Runs online inference (batch_size=1). |
-| [`fp32_batch_inference.sh`](fp32_batch_inference.sh) | Runs batch inference (batch_size=128). |
+| [`fp32_online_inference.sh`](fp32_online_inference.sh) | Runs online inference (batch_size=1). If no `DATASET_DIR` environment variable is set, synthetic data will be used. |
+| [`fp32_batch_inference.sh`](fp32_batch_inference.sh) | Runs batch inference (batch_size=128). If no `DATASET_DIR` environment variable is set, synthetic data will be used. |
 | [`fp32_accuracy.sh`](fp32_accuracy.sh) | Measures the model accuracy (batch_size=100). |
 
 These quickstart scripts can be run in different environments:
@@ -42,9 +42,9 @@ To run on bare metal, the following prerequisites must be installed in your envi
 Download and untar the model package. The model package includes a
 [pretrained model](https://zenodo.org/record/2535873/files/resnet50_v1.pb)
 and the scripts needed to run the ResNet50 v1.5 FP32 <model>. Set
-environment variables to point to the imagenet dataset directory, and an
-output directory where log files will be written, then run a
-[quickstart script](#quick-start-scripts).
+environment variables to point to the imagenet dataset directory (if real
+data is being used), and an output directory where log files will be
+written, then run a [quickstart script](#quick-start-scripts).
 
 ```
 DATASET_DIR=<path to the preprocessed imagenet dataset>
@@ -64,7 +64,8 @@ quickstart/<script name>.sh
 The model container `intel/image-recognition:tf-2.3.0-imz-2.1.0-resnet50v1-5-fp32-inference` includes the scripts
 and libraries needed to run ResNet50 v1.5 FP32 inference. To run one of the model
 inference quickstart scripts using this container, you'll need to provide volume mounts for
-the ImageNet dataset and an output directory where checkpoint files will be written.
+the ImageNet dataset (if a real dataset is being used) and an output directory where
+checkpoint files will be written.
 
 ```
 DATASET_DIR=<path to the preprocessed imagenet dataset>
