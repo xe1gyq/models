@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+MODEL_DIR=${MODEL_DIR-$PWD}
+
 if [ -z "${OUTPUT_DIR}" ]; then
   echo "The required environment variable OUTPUT_DIR has not been set"
   exit 1
@@ -23,27 +25,5 @@ fi
 # Create the output directory in case it doesn't already exist
 mkdir -p ${OUTPUT_DIR}
 
-# Use synthetic data (no --data-location arg) if no DATASET_DIR is set
-dataset_arg="--data-location=${DATASET_DIR}"
-if [ -z "${DATASET_DIR}" ]; then
-  echo "Using synthetic data, since the DATASET_DIR environment variable is not set."
-  dataset_arg=""
-elif [ ! -d "${DATASET_DIR}" ]; then
-  echo "The DATASET_DIR '${DATASET_DIR}' does not exist"
-  exit 1
-fi
-
-MODEL_FILE="$(pwd)/resnet50_v1.pb"
-
-source "$(dirname $0)/common/utils.sh"
-_command ${PREFIX} python benchmarks/launch_benchmark.py \
-         --model-name=resnet50v1_5 \
-         --precision=fp32 \
-         --mode=inference \
-         --framework tensorflow \
-         --in-graph ${MODEL_FILE} \
-         ${dataset_arg} \
-         --output-dir ${OUTPUT_DIR} \
-         --batch-size=1 \
-         --socket-id 0 \
-         $@
+python3 ${MODEL_DIR}/quickstart/common/tensorflow/multiinstance_run_benchmark.py \
+--run_script quickstart/fp32_batch_inference.sh
