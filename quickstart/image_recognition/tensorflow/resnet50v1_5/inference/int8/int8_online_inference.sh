@@ -39,7 +39,7 @@ fi
 MODEL_FILE="${MODEL_DIR}/pretrained_model/resnet50v1_5_int8_pretrained_model.pb"
 
 source "$(dirname $0)/common/utils.sh"
-_command python ${MODEL_DIR}/benchmarks/launch_benchmark.py \
+_command ${PREFIX} python ${MODEL_DIR}/benchmarks/launch_benchmark.py \
     --in-graph ${MODEL_FILE} \
     --model-name resnet50v1_5 \
     --framework tensorflow \

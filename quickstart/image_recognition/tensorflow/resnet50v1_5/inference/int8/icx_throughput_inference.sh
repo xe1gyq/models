@@ -25,30 +25,5 @@ fi
 # Create the output directory in case it doesn't already exist
 mkdir -p ${OUTPUT_DIR}
 
-# DATASET_DIR is optional
-if [ -z "${DATASET_DIR}" ]; then
-  DATASET_OPTION=""
-else
-  if [ ! -d "${DATASET_DIR}" ]; then
-    echo "The DATASET_DIR '${DATASET_DIR}' does not exist"
-    exit 1
-  fi
-  DATASET_OPTION="--data-location ${DATASET_DIR}"
-fi
-
-MODEL_FILE="${MODEL_DIR}/pretrained_model/resnet50v1_5_int8_pretrained_model.pb"
-
-source "$(dirname $0)/common/utils.sh"
-_command ${PREFIX} python ${MODEL_DIR}/benchmarks/launch_benchmark.py \
-    --in-graph ${MODEL_FILE} \
-    --model-name resnet50v1_5 \
-    --framework tensorflow \
-    --precision int8 \
-    --mode inference \
-    --batch-size=128 \
-    --output-dir ${OUTPUT_DIR} \
-    ${DATASET_OPTION} \
-    --benchmark-only \
-    $@ \
-    -- warmup_steps=50 steps=500
-
+python3 ${MODEL_DIR}/quickstart/common/tensorflow/multiinstance_run_benchmark.py \
+--run_script quickstart/int8_batch_inference.sh

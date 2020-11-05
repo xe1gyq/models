@@ -17,6 +17,9 @@ class LaunchMultiInstanceBenchmark(object):
         run_script = self.args.run_script.strip()
         script_basename = os.path.splitext(os.path.basename(run_script))[0]
 
+        if not os.path.exists(run_script):
+            sys.exit("The specified script '{}' does not exist.".format(run_script))
+
         if "OUTPUT_DIR" in os.environ:
             output_dir = os.getenv("OUTPUT_DIR")
         else:
@@ -27,10 +30,6 @@ class LaunchMultiInstanceBenchmark(object):
         if sys.version_info[0] < 3:
             sys.exit("ERROR: This script requires Python 3 (found Python {})"
                      .format(sys.version_info[0]))
-
-        # Install numactl
-        print("Installing numactl")
-        subprocess.call(["apt-get", "install", "numactl", "-y"])
 
         # Get platform info
         self.platform = platform_util.PlatformUtil(self.args)
@@ -81,6 +80,8 @@ class LaunchMultiInstanceBenchmark(object):
             print(multi_instance_command)
 
         run_multi_instance_file = "bash " + command_file_path
+        print("Running {}".format(run_multi_instance_file))
+
         sys.stdout.flush()
 
         if not args.dry_run:
