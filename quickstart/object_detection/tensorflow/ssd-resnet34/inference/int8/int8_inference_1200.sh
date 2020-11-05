@@ -17,6 +17,9 @@
 
 MODEL_DIR=${MODEL_DIR-$PWD}
 
+echo 'MODEL_DIR='$MODEL_DIR
+echo 'OUTPUT_DIR='$OUTPUT_DIR
+
 if [ -z "${OUTPUT_DIR}" ]; then
   echo "The required environment variable OUTPUT_DIR has not been set"
   exit 1
@@ -25,21 +28,33 @@ fi
 # Create the output directory in case it doesn't already exist
 mkdir -p ${OUTPUT_DIR}
 
+if [ -z "${TF_MODELS_DIR}" ]; then
+  echo "The required environment variable TF_MODELS_DIR has not been set."
+  echo "Set TF_MODELS_DIR to the directory where the tensorflow/models repo has been cloned."
+  exit 1
+fi
+
+if [ ! -d "${TF_MODELS_DIR}" ]; then
+  echo "The TF_MODELS_DIR directory '${TF_MODELS_DIR}' does not exist"
+  exit 1
+fi
+
 # If a prefix was given, don't specify a socket id
 socket_id_arg="--socket-id 0"
 if [[ ! -z "${PREFIX}" ]]; then
   socket_id_arg=""
 fi
 
-FROZEN_GRAPH=${FROZEN_GRAPH-"$MODEL_DIR/pretrained_model/ssd_resnet34_fp32_1200x1200_pretrained_model.pb"}
+export PYTHONPATH=${PYTHONPATH}:${TF_MODELS_DIR}/research
+export PYTHONPATH=${PYTHONPATH}:${TF_BENCHMARKS_DIR}/scripts/tf_cnn_benchmarks
 
 source "$(dirname $0)/common/utils.sh"
 _command ${PREFIX} python ${MODEL_DIR}/benchmarks/launch_benchmark.py \
-    --in-graph $FROZEN_GRAPH \
-    --model-source-dir $TF_MODELS_DIR \
+    --in-graph ${MODEL_DIR}/pretrained_models/ssd_resnet34_int8_1200x1200_pretrained_model.pb \
+    --model-source-dir ${TF_MODELS_DIR} \
     --model-name ssd-resnet34 \
     --framework tensorflow \
-    --precision fp32 \
+    --precision int8 \
     --mode inference \
     ${socket_id_arg} \
     --batch-size 1 \
