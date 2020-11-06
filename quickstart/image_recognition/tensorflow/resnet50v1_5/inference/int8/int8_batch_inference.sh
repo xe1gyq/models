@@ -53,4 +53,3 @@ _command ${PREFIX} python ${MODEL_DIR}/benchmarks/launch_benchmark.py \
     -- \
     warmup_steps=50 \
     steps=1500
-

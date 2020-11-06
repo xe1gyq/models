@@ -52,4 +52,7 @@ _command ${PREFIX} python benchmarks/launch_benchmark.py \
          --output-dir ${OUTPUT_DIR} \
          --batch-size=1 \
          ${socket_id_arg} \
-         $@
+         $@ \
+         -- \
+         warmup_steps=50 \
+         steps=1500

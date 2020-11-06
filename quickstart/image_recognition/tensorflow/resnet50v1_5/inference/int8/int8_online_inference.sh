@@ -50,5 +50,6 @@ _command ${PREFIX} python ${MODEL_DIR}/benchmarks/launch_benchmark.py \
     ${DATASET_OPTION} \
     --benchmark-only \
     $@ \
-    -- warmup_steps=50 \
+    -- \
+    warmup_steps=50 \
     steps=1500
