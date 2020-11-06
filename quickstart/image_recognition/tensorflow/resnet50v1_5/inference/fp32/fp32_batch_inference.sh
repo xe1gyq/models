@@ -53,5 +53,6 @@ _command ${PREFIX} python benchmarks/launch_benchmark.py \
          --batch-size=128 \
          ${socket_id_arg} \
          $@ \
-         -- warmup_steps=50 \
+         -- \
+         warmup_steps=50 \
          steps=1500
