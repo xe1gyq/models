@@ -35,22 +35,19 @@ if [ ! -d "${DATASET_DIR}" ]; then
   exit 1
 fi
 
-MODEL_FILE="${MODEL_DIR}/pretrained_model/resnet50v1_5_int8_pretrained_model.pb"
-if [ ! -f "${MODEL_FILE}" ]; then
-    echo "Following ${MODEL_FILE} frozen graph file does not exists"
-    exit 1
-fi
+FROZEN_GRAPH=${FROZEN_GRAPH-"$MODEL_DIR/pretrained_model/ssd_resnet34_int8_1200x1200_pretrained_model.pb"}
 
 source "$(dirname $0)/common/utils.sh"
 _command python ${MODEL_DIR}/benchmarks/launch_benchmark.py \
-    --data-location ${DATASET_DIR} \
-    --in-graph ${MODEL_FILE} \
-    --model-name resnet50v1_5 \
+    --data-location $DATASET_DIR \
+    --in-graph $FROZEN_GRAPH \
+    --model-source-dir $TF_MODELS_DIR \
+    --model-name ssd-resnet34 \
     --framework tensorflow \
     --precision int8 \
     --mode inference \
-    --batch-size=100 \
-    --output-dir ${OUTPUT_DIR} \
-    --accuracy-only \
     --socket-id 0 \
-    $@
+    --batch-size 1 \
+    --accuracy-only \
+    $@ \
+    -- input-size=1200
