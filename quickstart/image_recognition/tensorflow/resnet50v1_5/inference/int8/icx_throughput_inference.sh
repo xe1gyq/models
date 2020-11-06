@@ -17,6 +17,9 @@
 
 MODEL_DIR=${MODEL_DIR-$PWD}
 
+echo 'OUTPUT_DIR='$OUTPUT_DIR
+echo 'DATASET_DIR='$DATASET_DIR
+
 if [ -z "${OUTPUT_DIR}" ]; then
   echo "The required environment variable OUTPUT_DIR has not been set"
   exit 1
@@ -27,3 +30,6 @@ mkdir -p ${OUTPUT_DIR}
 
 python3 ${MODEL_DIR}/quickstart/common/tensorflow/multiinstance_run_benchmark.py \
 --run_script quickstart/int8_batch_inference.sh
+
+echo "Throughput summary:"
+grep 'Throughput' ${OUTPUT_DIR}/int8_batch_inference_*log  | awk -F' ' '{sum+=$2;} END{print sum} '
