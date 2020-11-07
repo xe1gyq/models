@@ -16,6 +16,10 @@ class LaunchMultiInstanceBenchmark(object):
         self.args = args
         run_script = self.args.run_script.strip()
         script_basename = os.path.splitext(os.path.basename(run_script))[0]
+        log_file_prefix = self.args.log_file_prefix.strip()
+
+        if not log_file_prefix:
+            log_file_prefix = script_basename
 
         if not os.path.exists(run_script):
             sys.exit("The specified script '{}' does not exist.".format(run_script))
@@ -40,30 +44,59 @@ class LaunchMultiInstanceBenchmark(object):
         # Create the shell script with run commands for each instance
         multi_instance_command = "#!/usr/bin/env bash \n\n"
 
-        for test_cores in test_cores_list:
-            instance_num = test_cores_list.index(test_cores)
+        if "training" in run_script:
+            # For training, add on mpi args to the quickstart command
+            get_crti = 'find /usr/ -name crti* | head -n 1'
+            crti_path_shell = subprocess.Popen(get_crti, shell=True,
+                                               stdout=subprocess.PIPE)
+            crti_path = crti_path_shell.stdout.readline()
+            crti_path = str(crti_path).lstrip("b'").rstrip("\\n'")
+            crti_path_env = '/'.join(crti_path.split('/')[:-1])
+            run_env = 'export LIBRARY_PATH={0}:$LIBRARY_PATH;'.format(crti_path_env)
 
-            if len(test_cores) < int(cores_per_instance):
-                print("NOTE: Skipping remainder of {} cores for instance {}"
-                      .format(len(test_cores), instance_num))
-                continue
+            all_instance_log = os.path.join(output_dir, "{}_instance_all.log".
+                                            format(log_file_prefix))
 
-            numactl_cpu_list = ','.join(test_cores)
-            instance_log = os.path.join(output_dir, "{}_cores{}_instance{}.log".
-                                        format(script_basename, cores_per_instance, instance_num))
+            batch_size = 256
 
-            prefix = ("OMP_NUM_THREADS={0} "
-                      "KMP_AFFINITY=granularity=fine,verbose,compact,1,0 "
-                      "numactl --localalloc --physcpubind={1}").format(len(test_cores), numactl_cpu_list)
+            training_command = ("PREFIX=\"{0}\" "
+                                "bash {1} "
+                                "--num-intra-threads {2} --num-inter-threads 2 "
+                                "--mpi_num_processes={3} --mpi_num_processes_per_socket=1 "
+                                "--batch-size {4} "
+                                "-- steps=300 train_epochs=1 epochs_between_evals=1 "
+                                "2>&1 | tee {5}\n").format(
+                run_env, run_script, int(cpu_info_list[1])-4, cpu_info_list[0], batch_size, all_instance_log)
 
-            multi_instance_command += ("PREFIX=\"{0}\" "
-                                      "bash {1} "
-                                      "--num-intra-threads {2} --num-inter-threads 1 "
-                                      "--data-num-intra-threads {2} --data-num-inter-threads 1 "
-                                      "> {3} 2>&1 & \\\n").format(
-                prefix, run_script, len(test_cores), instance_log)
+            multi_instance_command += training_command
 
-        multi_instance_command += "wait"
+        else:
+            # For inference, run multiple instances using numactl
+            for test_cores in test_cores_list:
+                instance_num = test_cores_list.index(test_cores)
+
+                if len(test_cores) < int(cores_per_instance):
+                    print("NOTE: Skipping remainder of {} cores for instance {}"
+                          .format(len(test_cores), instance_num))
+                    continue
+
+                numactl_cpu_list = ','.join(test_cores)
+                instance_log = os.path.join(output_dir, "{}_cores{}_instance{}.log".
+                                            format(log_file_prefix, cores_per_instance, instance_num))
+
+                prefix = ("OMP_NUM_THREADS={0} "
+                          "KMP_AFFINITY=granularity=fine,verbose,compact,1,0 "
+                          "numactl --localalloc --physcpubind={1}").format(len(test_cores), numactl_cpu_list)
+
+                multi_instance_command += ("PREFIX=\"{0}\" "
+                                          "bash {1} "
+                                          "--num-intra-threads {2} --num-inter-threads 1 "
+                                          "--data-num-intra-threads {2} --data-num-inter-threads 1 "
+                                          "> {3} 2>&1 & \\\n").format(
+                    prefix, run_script, len(test_cores), instance_log)
+
+            multi_instance_command += "wait"
+
         sys.stdout.flush()
 
         # Write command file
@@ -86,6 +119,19 @@ class LaunchMultiInstanceBenchmark(object):
 
         if not args.dry_run:
             subprocess.call(run_multi_instance_file, shell=True, executable="/bin/bash")
+
+        if "training" in run_script:
+            sleep(5)
+            throughput_command = 'cat {0} | grep "global_step/sec:" | sed -e s"/.*: //" | tail -n 1'.format(
+                all_instance_log)
+            get_global_step = subprocess.Popen(throughput_command, shell=True,
+                                               stdout=subprocess.PIPE)
+            global_step_byte = get_global_step.stdout.readline()
+            global_step = float(
+                str(global_step_byte).lstrip("b'").rstrip("\\n'"))
+            throughput = global_step * int(batch_size) * int(cpu_info_list[0])
+            print("{} * {} * {} = {}".format(global_step, batch_size, cpu_info_list[0], throughput))
+            print("Throughput: {}".format(throughput))
 
     def list_of_groups(self, init_list, children_list_len):
         children_list_len = int(children_list_len)
@@ -122,7 +168,6 @@ class LaunchMultiInstanceBenchmark(object):
                          self.platform.num_numa_nodes]
         return cpu_info_list, test_cores_list
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="run LZ models jenkins")
     parser.add_argument("--cores_per_instance", "-cpi",
@@ -135,6 +180,11 @@ if __name__ == '__main__':
                              "--num-inter-threads/--num-intra-threads will be added "
                              "to the end.",
                         required=True)
+    parser.add_argument("--log_file_prefix",
+                        help="Specify the prefix for the log file names for each "
+                             "instance. If no value is given this this defaults to "
+                             "use the base name of the run script.",
+                        required=False, default="")
     parser.add_argument("--dry_run",
                         help="Prints the run command, but does not execute the script",
                         dest="dry_run", action="store_true")

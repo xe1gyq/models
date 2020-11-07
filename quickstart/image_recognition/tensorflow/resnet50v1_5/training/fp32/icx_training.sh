@@ -15,6 +15,11 @@
 # limitations under the License.
 #
 
+MODEL_DIR=${MODEL_DIR-$PWD}
+
+echo 'OUTPUT_DIR='$OUTPUT_DIR
+echo 'DATASET_DIR='$DATASET_DIR
+
 if [ -z "${OUTPUT_DIR}" ]; then
   echo "The required environment variable OUTPUT_DIR has not been set"
   exit 1
@@ -33,14 +38,5 @@ if [ ! -d "${DATASET_DIR}" ]; then
   exit 1
 fi
 
-source "$(dirname $0)/common/utils.sh"
-_command ${PREFIX} python benchmarks/launch_benchmark.py \
-         --model-name=resnet50v1_5 \
-         --precision=fp32 \
-         --mode=training \
-         --framework tensorflow \
-         --checkpoint ${OUTPUT_DIR} \
-         --data-location=${DATASET_DIR} \
-         --output-dir ${OUTPUT_DIR} \
-         $@
-
+python3 ${MODEL_DIR}/quickstart/common/tensorflow/multiinstance_run_benchmark.py \
+--run_script quickstart/fp32_training_full.sh
