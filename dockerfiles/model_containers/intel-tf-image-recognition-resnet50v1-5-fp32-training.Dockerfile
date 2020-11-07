@@ -87,6 +87,9 @@ RUN apt-get update && \
 # replace the line with: pip install horovod>0.20.3
 RUN pip install git+https://github.com/horovod/horovod.git@bb4e4cf7
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends --fix-missing numactl
+
 ARG PACKAGE_DIR=model_packages
 
 ARG PACKAGE_NAME
