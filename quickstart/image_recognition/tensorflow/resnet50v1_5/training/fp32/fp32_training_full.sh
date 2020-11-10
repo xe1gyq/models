@@ -42,5 +42,6 @@ _command ${PREFIX} python benchmarks/launch_benchmark.py \
          --checkpoint ${OUTPUT_DIR} \
          --data-location=${DATASET_DIR} \
          --output-dir ${OUTPUT_DIR} \
+         --verbose \
          $@
 
