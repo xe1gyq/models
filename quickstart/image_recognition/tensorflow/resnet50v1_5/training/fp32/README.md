@@ -14,7 +14,7 @@ ImageNet dataset in the TF records format.
 <!--- 20. Download link -->
 ## Download link
 
-[resnet50v1-5-fp32-training.tar.gz](https://storage.googleapis.com/intel-optimized-tensorflow/models/v2_1_0/resnet50v1-5-fp32-training.tar.gz)
+[resnet50v1-5-fp32-training.tar.gz](https://ubit-artifactory-or.intel.com/artifactory/aipg-local/aipg-tf/modular-zoo-model-package-generator/443/resnet50v1-5-fp32-training.tar.gz)
 
 <!--- 40. Quick Start Scripts -->
 ## Quick Start Scripts
@@ -24,6 +24,7 @@ ImageNet dataset in the TF records format.
 | [`fp32_training_demo.sh`](fp32_training_demo.sh) | Executes a short run using small batch sizes and a limited number of steps to demonstrate the training flow |
 | [`fp32_training_1_epoch.sh`](fp32_training_1_epoch.sh) | Executes a test run that trains the model for 1 epoch and saves checkpoint files to an output directory. |
 | [`fp32_training_full.sh`](fp32_training_full.sh) | Trains the model using the full dataset and runs until convergence (90 epochs) and saves checkpoint files to an output directory. Note that this will take a considerable amount of time. |
+| [`icx_training.sh`](icx_training.sh) | Training script for ICX that runs multi-instance training using mpirun for 300 steps with a batch size of 256. |
 
 These quick start scripts can be run in different environments:
 * [Bare Metal](#bare-metal)
@@ -44,7 +45,7 @@ Download and untar the model package and then run a [quickstart script](#quick-s
 DATASET_DIR=<path to the preprocessed imagenet dataset>
 OUTPUT_DIR=<directory where checkpoint and log files will be written>
 
-wget https://storage.googleapis.com/intel-optimized-tensorflow/models/v2_1_0/resnet50v1-5-fp32-training.tar.gz
+wget https://ubit-artifactory-or.intel.com/artifactory/aipg-local/aipg-tf/modular-zoo-model-package-generator/443/resnet50v1-5-fp32-training.tar.gz
 tar -xvf resnet50v1-5-fp32-training.tar.gz
 cd resnet50v1-5-fp32-training
 
@@ -70,14 +71,14 @@ docker run \
   --volume ${DATASET_DIR}:${DATASET_DIR} \
   --volume ${OUTPUT_DIR}:${OUTPUT_DIR} \
   --privileged --init -t \
-  intel/image-recognition:tf-2.3.0-imz-2.1.0-resnet50v1-5-fp32-training \
+  intel/image-recognition:tf-r2.4-imz-2.1.0-icx-ef82f4c66-resnet50v1-5-fp32-training \
   /bin/bash quickstart/<script name>.sh
 ```
 
 
 <!-- 61. Advanced Options -->
 
-See the [Advanced Options for Model Packages and Containers](/quickstart/common/ModelPackagesAdvancedOptions.md)
+See the [Advanced Options for Model Packages and Containers](/quickstart/common/tensorflow/ModelPackagesAdvancedOptions.md)
 document for more advanced use cases.
 
 <!--- 80. License -->

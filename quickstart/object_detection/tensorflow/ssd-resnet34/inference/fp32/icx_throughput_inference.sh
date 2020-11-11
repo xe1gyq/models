@@ -25,5 +25,11 @@ fi
 # Create the output directory in case it doesn't already exist
 mkdir -p ${OUTPUT_DIR}
 
+log_file_prefix="fp32_throughput_inference_1200"
+
 python3 ${MODEL_DIR}/quickstart/common/tensorflow/multiinstance_run_benchmark.py \
---run_script quickstart/fp32_inference_1200.sh
+--run_script quickstart/fp32_inference_1200.sh \
+--log_file_prefix ${log_file_prefix}
+
+echo "Summary total samples/sec:"
+grep 'Total samples/sec' ${OUTPUT_DIR}/${log_file_prefix}*log  | awk -F' ' '{sum+=$3;} END{print sum} '

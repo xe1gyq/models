@@ -11,7 +11,7 @@ using Intel-optimized TensorFlow.
 <!--- 20. Download link -->
 ## Download link
 
-[ssd-resnet34-int8-inference.tar.gz](https://storage.googleapis.com/intel-optimized-tensorflow/models/v2_1_0/ssd-resnet34-int8-inference.tar.gz)
+[ssd-resnet34-int8-inference.tar.gz](https://ubit-artifactory-or.intel.com/artifactory/aipg-local/aipg-tf/modular-zoo-model-package-generator/443/ssd-resnet34-int8-inference.tar.gz)
 
 <!--- 30. Datasets -->
 ## Datasets
@@ -37,6 +37,8 @@ test uses synthetic dataset.
 |-------------|-------------|
 | [int8_accuracy.sh](int8_accuracy.sh) | Tests accuracy using the COCO dataset in the TF Records format. |
 | [int8_inference.sh](int8_inference.sh) | Run inference using synthetic data and outputs performance metrics. |
+| [icx_realtime_inference.sh](icx_realtime_inference.sh) | Realtime inference script for ICX that uses numactl to run multiple instances using 4 cores per instance. |
+| [icx_throughput_inference.sh](icx_throughput_inference.sh) | Throughput inference script for ICX that uses numactl to run multiple instances using the cores on each socket per instance. |
 
 These quickstart scripts can be run in different environments:
 * [Bare Metal](#bare-metal)
@@ -90,7 +92,7 @@ download and untar the model package. The model package includes the
 SSD-ResNet34 Int8 pretrained model and the scripts needed to run
 inference.
 ```
-wget https://storage.googleapis.com/intel-optimized-tensorflow/models/v2_1_0/ssd-resnet34-int8-inference.tar.gz
+wget https://ubit-artifactory-or.intel.com/artifactory/aipg-local/aipg-tf/modular-zoo-model-package-generator/443/ssd-resnet34-int8-inference.tar.gz
 tar -xzf ssd-resnet34-int8-inference.tar.gz
 cd ssd-resnet34-int8-inference
 ```
@@ -136,8 +138,8 @@ docker run \
   --env https_proxy=${https_proxy} \
   --volume ${OUTPUT_DIR}:${OUTPUT_DIR} \
   --privileged --init -t \
-  intel/object-detection:tf-2.3.0-imz-2.1.0-ssd-resnet34-int8-inference \
-  /bin/bash quickstart/int8_inference.sh
+  intel/object-detection:tf-r2.4-imz-2.1.0-icx-ef82f4c66-ssd-resnet34-int8-inference \
+  /bin/bash quickstart/<script name>.sh
 ```
 
 To test accuracy using the COCO dataset:
@@ -153,7 +155,7 @@ docker run \
   --volume ${DATASET_DIR}:${DATASET_DIR} \
   --volume ${OUTPUT_DIR}:${OUTPUT_DIR} \
   --privileged --init -t \
-  intel/object-detection:tf-2.3.0-imz-2.1.0-ssd-resnet34-int8-inference \
+  intel/object-detection:tf-r2.4-imz-2.1.0-icx-ef82f4c66-ssd-resnet34-int8-inference \
   /bin/bash quickstart/int8_accuracy.sh
 ```
 

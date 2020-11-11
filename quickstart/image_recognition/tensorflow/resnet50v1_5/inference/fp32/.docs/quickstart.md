@@ -6,6 +6,8 @@
 | [`fp32_online_inference.sh`](fp32_online_inference.sh) | Runs online inference (batch_size=1). If no `DATASET_DIR` environment variable is set, synthetic data will be used. |
 | [`fp32_batch_inference.sh`](fp32_batch_inference.sh) | Runs batch inference (batch_size=128). If no `DATASET_DIR` environment variable is set, synthetic data will be used. |
 | [`fp32_accuracy.sh`](fp32_accuracy.sh) | Measures the model accuracy (batch_size=100). |
+| [`icx_realtime_inference.sh`](icx_realtime_inference.sh) | Realtime inference script for ICX that uses numactl to run multiple instances using 4 cores per instance. |
+| [`icx_throughput_inference.sh`](icx_throughput_inference.sh) | Throughput inference script for ICX that uses numactl to run multiple instances using the cores on each socket per instance. |
 
 These quickstart scripts can be run in different environments:
 * [Bare Metal](#bare-metal)

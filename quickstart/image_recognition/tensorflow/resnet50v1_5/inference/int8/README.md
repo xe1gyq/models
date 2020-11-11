@@ -29,6 +29,8 @@ Set the `DATASET_DIR` to point to the TF records directory when running ResNet50
 | [`int8_online_inference.sh`](int8_online_inference.sh) | Runs online inference (batch_size=1). |
 | [`int8_batch_inference.sh`](int8_batch_inference.sh) | Runs batch inference (batch_size=128). |
 | [`int8_accuracy.sh`](int8_accuracy.sh) | Measures the model accuracy (batch_size=100). |
+| [`icx_realtime_inference.sh`](icx_realtime_inference.sh) | Realtime inference script for ICX that uses numactl to run multiple instances using 4 cores per instance. |
+| [`icx_throughput_inference.sh`](icx_throughput_inference.sh) | Throughput inference script for ICX that uses numactl to run multiple instances using the cores on each socket per instance. |
 
 These quickstart scripts can be run in different environments:
 * [Bare Metal](#bare-metal)
@@ -55,7 +57,7 @@ Otherwise `DATASET_DIR` needs to be set:
 DATASET_DIR=<path to the dataset>
 OUTPUT_DIR=<directory where log files will be written>
 
-wget https://storage.googleapis.com/intel-optimized-tensorflow/models/v2_1_0/resnet50v1-5-int8-inference.tar.gz
+wget https://ubit-artifactory-or.intel.com/artifactory/aipg-local/aipg-tf/modular-zoo-model-package-generator/443/resnet50v1-5-int8-inference.tar.gz
 tar -xzf resnet50v1-5-int8-inference.tar.gz
 cd resnet50v1-5-int8-inference
 
@@ -65,7 +67,7 @@ quickstart/<script name>.sh
 <!--- 60. Docker -->
 ## Docker
 
-The model container `intel/image-recognition:tf-2.3.0-imz-2.1.0-resnet50v1-5-int8-inference` includes the scripts and libraries needed to run
+The model container `intel/image-recognition:tf-r2.4-imz-2.1.0-icx-ef82f4c66-resnet50v1-5-int8-inference` includes the scripts and libraries needed to run
 ResNet50 v1.5 Int8 inference. To run one of the quickstart scripts 
 using this container, you'll need to provide volume mounts for the dataset 
 and an output directory.
@@ -88,7 +90,7 @@ docker run \
   --volume ${DATASET_DIR}:${DATASET_DIR} \
   --volume ${OUTPUT_DIR}:${OUTPUT_DIR} \
   --privileged --init -t \
-  intel/image-recognition:tf-2.3.0-imz-2.1.0-resnet50v1-5-int8-inference \
+  intel/image-recognition:tf-r2.4-imz-2.1.0-icx-ef82f4c66-resnet50v1-5-int8-inference \
   /bin/bash quickstart/<script name>.sh
 ```
 

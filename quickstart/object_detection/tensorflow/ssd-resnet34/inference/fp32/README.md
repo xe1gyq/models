@@ -14,7 +14,7 @@ Use the link below to download the model package for SSD-ResNet34
 FP32 <inference>. The model package includes scripts and
 documentation need to run the model.
 
-[ssd-resnet34-fp32-inference.tar.gz](https://storage.googleapis.com/intel-optimized-tensorflow/models/v2_1_0/ssd-resnet34-fp32-inference.tar.gz)
+[ssd-resnet34-fp32-inference.tar.gz](https://ubit-artifactory-or.intel.com/artifactory/aipg-local/aipg-tf/modular-zoo-model-package-generator/443/ssd-resnet34-fp32-inference.tar.gz)
 
 <!--- 30. Datasets -->
 ## Datasets
@@ -40,7 +40,8 @@ so no dataset is required.
 | [fp32_accuracy_1200.sh](fp32_accuracy_1200.sh) | Runs an accuracy test using data in the TF records format with an input size of 1200x1200. |
 | [fp32_inference.sh](fp32_inference.sh) | Runs inference with a batch size of 1 using synthetic data with an input size of 300x300. Prints out the time spent per batch and total samples/second. |
 | [fp32_inference_1200.sh](fp32_inference_1200.sh) | Runs inference with a batch size of 1 using synthetic data with an input size of 1200x1200. Prints out the time spent per batch and total samples/second. |
-
+| [icx_realtime_inference.sh](icx_realtime_inference.sh) | Realtime inference script for ICX that uses numactl to run multiple instances using 4 cores per instance. |
+| [icx_throughput_inference.sh](icx_throughput_inference.sh) | Throughput inference script for ICX that uses numactl to run multiple instances using the cores on each socket per instance. |
 
 These quickstart scripts can be run in different environments:
 * [Bare Metal](#bare-metal)
@@ -99,7 +100,7 @@ testing only -- inference benchmarking uses synthetic data) and an
 DATASET_DIR=<path to the dataset (for accuracy testing only)>
 OUTPUT_DIR=<directory where log files will be written>
 
-wget https://storage.googleapis.com/intel-optimized-tensorflow/models/v2_1_0/ssd-resnet34-fp32-inference.tar.gz
+wget https://ubit-artifactory-or.intel.com/artifactory/aipg-local/aipg-tf/modular-zoo-model-package-generator/443/ssd-resnet34-fp32-inference.tar.gz
 tar -xzf ssd-resnet34-fp32-inference.tar.gz
 cd ssd-resnet34-fp32-inference
 
@@ -129,7 +130,7 @@ docker run \
   --volume ${DATASET_DIR}:${DATASET_DIR} \
   --volume ${OUTPUT_DIR}:${OUTPUT_DIR} \
   --privileged --init -t \
-  intel/object-detection:tf-2.3.0-imz-2.1.0-ssd-resnet34-fp32-inference \
+  intel/object-detection:tf-r2.4-imz-2.1.0-icx-ef82f4c66-ssd-resnet34-fp32-inference \
   /bin/bash quickstart/<script name>.sh
 ```
 
