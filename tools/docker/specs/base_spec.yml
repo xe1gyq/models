@@ -55,7 +55,7 @@ slice_sets:
           partials:
               - tensorflow/tensorflow-base
           args:
-              - TENSORFLOW_IMAGE=amr-registry.caas.intel.com/aipg-tf/intel-optimized-tensorflow
+              - TENSORFLOW_IMAGE=intel/intel-optimized-tensorflow
 
     ubuntu:
         - add_to_name: ""
