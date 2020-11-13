@@ -153,7 +153,7 @@ slice_sets:
               - object_detection/pip_installs
               - object_detection/protoc
           args:
-              - PY_VERSION=3.7
+              - PY_VERSION=3.6
           files:
                - source: LICENSE
                  destination: licenses/LICENSE
