@@ -10,7 +10,7 @@ Intel-optimized TensorFlow.
 <!--- 20. Download link -->
 ## Download link
 
-[resnet50v1-5-int8-inference.tar.gz](https://storage.googleapis.com/intel-optimized-tensorflow/models/v_2_1_0_icx/resnet50v1-5-int8-inference.tar.gz)
+[resnet50v1-5-int8-inference.tar.gz](https://storage.googleapis.com/intel-optimized-tensorflow/models/v2_1_0_icx/resnet50v1-5-int8-inference.tar.gz)
 
 <!--- 30. Datasets -->
 ## Datasets
