@@ -37,7 +37,7 @@ slice_sets:
         <precision>: Int8
         <use case>: image-recognition
         <docker image>: intel/image-recognition:tf-r2.4-imz-2.1.0-icx-ef82f4c66-resnet50v1-5-int8-inference
-        <package url>: https://ubit-artifactory-or.intel.com/artifactory/aipg-local/aipg-tf/modular-zoo-model-package-generator/443/resnet50v1-5-int8-inference.tar.gz
+        <package url>: https://storage.googleapis.com/intel-optimized-tensorflow/models/v_2_1_0_icx/resnet50v1-5-int8-inference.tar.gz
       uri: models/quickstart/image_recognition/tensorflow/resnet50v1_5/inference/int8
     downloads:
       - source: https://storage.googleapis.com/intel-optimized-tensorflow/models/v1_8/resnet50v1_5_int8_pretrained_model.pb

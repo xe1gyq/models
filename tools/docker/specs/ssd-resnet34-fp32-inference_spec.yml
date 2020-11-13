@@ -40,7 +40,7 @@ slice_sets:
         <model name>: SSD-ResNet34
         <precision>: FP32
         <use case>: object_detection
-        <package url>: https://ubit-artifactory-or.intel.com/artifactory/aipg-local/aipg-tf/modular-zoo-model-package-generator/443/ssd-resnet34-fp32-inference.tar.gz
+        <package url>: https://storage.googleapis.com/intel-optimized-tensorflow/models/v_2_1_0_icx/ssd-resnet34-fp32-inference.tar.gz
         <package name>: ssd-resnet34-fp32-inference.tar.gz
         <package dir>: ssd-resnet34-fp32-inference
         <docker image>: intel/object-detection:tf-r2.4-imz-2.1.0-icx-ef82f4c66-ssd-resnet34-fp32-inference
