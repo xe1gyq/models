@@ -26,6 +26,7 @@ import random
 import requests
 import numpy as np
 from PIL import Image
+from statsd import StatsClient
 
 
 def check_for_link(value):
@@ -102,6 +103,7 @@ def send_request(predict_request):
 def benchmark(batch_size=1, num_iteration=20, warm_up_iteration=10):
     i = 0
     total_time = 0
+    statsd = StatsClient(host='10.219.128.114', port=8125)
     for _ in range(num_iteration):
         i += 1
         predict_request = make_request(batch_size)
@@ -109,16 +111,30 @@ def benchmark(batch_size=1, num_iteration=20, warm_up_iteration=10):
         send_request(predict_request)
         time_consume = time.time() - start_time
         print('Iteration %d: %.3f sec' % (i, time_consume))
+        metric_name = "{},fp={},benchmark={}".format('iteration', 'fp32', 'object_detection')
+        self.statsd.gauge(metric_name, i)
+        metric_name = "{},fp={},benchmark={}".format('time_consume', 'fp32', 'object_detection')
+        self.statsd.gauge(metric_name, time_consume)
         if i > warm_up_iteration:
             total_time += time_consume
 
     time_average = total_time / (num_iteration - warm_up_iteration)
     print('Average time: %.3f sec' % (time_average))
+    metric_name = "{},fp={},benchmark={}".format('time_average', 'fp32', 'object_detection')
+    self.statsd.gauge(metric_name, time_average)
+
     print('Batch size = %d' % batch_size)
+    metric_name = "{},fp={},benchmark={}".format('batch_size', 'fp32', 'object_detection')
+    self.statsd.gauge(metric_name, batch_size)
+
     if batch_size == 1:
         print('Latency: %.3f ms' % (time_average * 1000))
-    print('Throughput: %.3f images/sec' % (batch_size / time_average))
+        metric_name = "{},fp={},benchmark={}".format((time_average * 1000), 'fp32', 'object_detection')
+        self.statsd.gauge(metric_name, (time_average * 1000))
 
+    print('Throughput: %.3f images/sec' % (batch_size / time_average))
+    metric_name = "{},fp={},benchmark={}".format((batch_size / time_average), 'fp32', 'object_detection')
+    self.statsd.gauge(metric_name, (batch_size / time_average))
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()

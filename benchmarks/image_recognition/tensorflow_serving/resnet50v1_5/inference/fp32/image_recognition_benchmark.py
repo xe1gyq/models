@@ -37,6 +37,8 @@ from tensorflow_serving.apis import prediction_service_pb2_grpc
 
 from util import preprocess_image, parse_example_proto
 
+from statsd import StatsClient
+
 tf_v1.disable_eager_execution()
 
 tf_v1.app.flags.DEFINE_string('server', 'localhost:8500', 'PredictionService host:port')
@@ -87,20 +89,35 @@ def main(_):
             tf.make_tensor_proto(image_np, shape=[FLAGS.batch_size, IMAGE_SIZE, IMAGE_SIZE, 3]))
         start_time = time.time()
         stub.Predict(request, 10.0)  # 10 secs timeout
+
         time_consume = time.time() - start_time
         print('Iteration %d: %.3f sec' % (i, time_consume))
+        metric_name = "{},fp={},benchmark={}".format('iteration', 'fp32', 'image_recognition')
+
+        self.statsd.gauge(metric_name, i)
+        metric_name = "{},fp={},benchmark={}".format('time_consume', 'fp32', 'image_recognition')
+        self.statsd.gauge(metric_name, time_consume)
+
         if i > warm_up_iteration:
             total_time += time_consume
 
     time_average = total_time / (num_iteration - warm_up_iteration)
     print('Average time: %.3f sec' % (time_average))
+    metric_name = "{},fp={},benchmark={}".format('time_average', 'fp32', 'image_recognition')
+    self.statsd.gauge(metric_name, time_average)
 
     print('Batch size = %d' % FLAGS.batch_size)
+    metric_name = "{},fp={},benchmark={}".format('batch_size', 'fp32', 'image_recognition')
+    self.statsd.gauge(metric_name, batch_size)
+
     if (FLAGS.batch_size == 1):
         print('Latency: %.3f ms' % (time_average * 1000))
+        metric_name = "{},fp={},benchmark={}".format((time_average * 1000), 'fp32', 'image_recognition')
+        self.statsd.gauge(metric_name, (time_average * 1000))
 
     print('Throughput: %.3f images/sec' % (FLAGS.batch_size / time_average))
-
+    metric_name = "{},fp={},benchmark={}".format((FLAGS.batch_size / time_average), 'fp32', 'image_recognition')
+    self.statsd.gauge(metric_name, (batch_size / time_average))
 
 if __name__ == '__main__':
     tf_v1.app.run()

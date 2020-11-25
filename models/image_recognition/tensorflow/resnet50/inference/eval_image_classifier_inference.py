@@ -28,6 +28,8 @@ from tensorflow.python.framework import dtypes
 import datasets
 import numpy as np
 
+from statsd import TCPStatsClient
+
 INPUTS = 'input'
 OUTPUTS = 'predict'
 
@@ -101,6 +103,8 @@ class eval_classifier_optimized_graph:
     self.args = arg_parser.parse_args()
     # validate the arguements
     self.validate_args()
+
+    self.statsd = TCPStatsClient(host='10.219.128.114', port=8125)
 
   def write_results_output(self, predictions, filenames, labels):
     # If a results_file_path is provided, write the predictions to the file
@@ -205,17 +209,36 @@ class eval_classifier_optimized_graph:
           time_consume += data_load_time
 
         print('Iteration %d: %.6f sec' % (iteration, time_consume))
+        metric_name = "{},fp={},benchmark={}".format('iteration', 'fp32', 'image_recognition')
+        self.statsd.gauge(metric_name, iteration)
+        metric_name = "{},fp={},benchmark={}".format('time_consume', 'fp32', 'image_recognition')
+        self.statsd.gauge(metric_name, time_consume)
+
         if iteration > warm_up_iteration:
           total_time += time_consume
 
       time_average = total_time / (iteration - warm_up_iteration)
       print('Average time: %.6f sec' % (time_average))
+      metric_name = "{},fp={},benchmark={}".format('time_average', 'fp32', 'image_recognition')
+      self.statsd.gauge(metric_name, time_average)
 
       print('Batch size = %d' % self.args.batch_size)
+      metric_name = "{},fp={},benchmark={}".format('batch_size', 'fp32', 'image_recognition')
+      self.statsd.gauge(metric_name, self.args.batch_size)
+
       if (self.args.batch_size == 1):
         print('Latency: %.3f ms' % (time_average * 1000))
+
+      metric_name = "{},fp={},benchmark={}".format('latency', 'fp32', 'image_recognition')
+      self.statsd.gauge(metric_name, (time_average * 1000))
+
       # print throughput for both batch size 1 and 128
       print('Throughput: %.3f images/sec' % (self.args.batch_size / time_average))
+      metric_name = "{},fp={},benchmark={}".format('throughput', 'fp32', 'image_recognition')
+      self.statsd.gauge(metric_name, (self.args.batch_size / time_average))
+
+      metric_name = "{},fp={},benchmark={}".format('iteration', 'fp32', 'image_recognition')
+      self.statsd.gauge(metric_name, 0)
 
     else: # accuracy check
       total_accuracy1, total_accuracy5 = (0.0, 0.0)
